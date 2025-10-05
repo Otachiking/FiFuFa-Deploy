@@ -35,3 +35,15 @@ Thumbs.db
 
 # Misc
 coverage/
+
+# Logs
+logs/
+*.log
+
+# Vercel
+.vercel/
+
+# Temporary files
+.tmp/
+.cache/
+.vercel
