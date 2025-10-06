@@ -1,0 +1,27 @@
+{
+  "name": "FiFuFa - Five Fun Facts Generator",
+  "short_name": "FiFuFa",
+  "description": "AI-powered bilingual facts generator using IBM Granite 3.3-8B",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    },
+    {
+      "src": "/favicon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/favicon-512.png", 
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#1E3A8A",
+  "background_color": "#ffffff",
+  "orientation": "portrait"
+}

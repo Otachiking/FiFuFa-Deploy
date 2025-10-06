@@ -62,6 +62,7 @@ export default async function handler(req, res) {
       .filter((f) => f.length > 0);
 
     logger.success(`[${validLanguage}] (${facts.length} facts): Generated successfully`);
+    logger.success(`Result: ${facts.join(',')} `);
 
     res.status(200).json({ facts, language: validLanguage });
   } catch (error) {

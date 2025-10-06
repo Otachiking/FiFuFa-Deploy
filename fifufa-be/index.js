@@ -88,8 +88,8 @@ const getFactsPrompt = (topic, language, isMore = false) => {
       unpopular: `(facts 6-10) List 5 unpopular facts about ${topic}. Each <35 word & give relevant emojis. Be Unique`
     },
     id: {
-      popular: `Beri 5 fakta ringkas umum soal ${topic}. Per fakta beri emoji relevan per fakta SINGKAT AJA. Each <15 words. Pakai Bahasa Indonesia`,
-      unpopular: `Beri 5 fakta ringkas unpopular soal ${topic}. Each <15 words.  Per fakta beri emoji relevan per fakta SINGKAT AJA. Pakai Bahasa Indonesia`
+      popular: `Beri 5 fakta ringkas umum soal ${topic}. Per fakta beri emoji relevan, fakta SINGKAT AJA. Each <15 words. Pakai Bahasa Indonesia`,
+      unpopular: `Beri 5 fakta ringkas unpopular soal ${topic}. Each <15 words.  Per fakta beri emoji relevan, fakta SINGKAT AJA. Pakai Bahasa Indonesia`
     }
   };
   

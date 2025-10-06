@@ -66,12 +66,12 @@ const LanguageToggle = ({ currentLanguage, onLanguageChange, colors }) => {
   ];
 
   return (
-    <div className="flex items-center gap-1 bg-white rounded-full p-1 shadow-lg border">
+    <div className="flex items-center gap-1 bg-white rounded-xl p-1 shadow-lg border">
       {languages.map((lang) => (
         <motion.button
           key={lang.code}
           onClick={() => onLanguageChange(lang.code)}
-          className={`px-3 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${
+          className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${
             currentLanguage === lang.code 
               ? 'text-white shadow-md' 
               : 'text-gray-600 hover:text-gray-800'
@@ -327,8 +327,8 @@ function App() {
         />
       </div>
 
-      {/* Language Toggle - Top Right */}
-      <div className="absolute top-6 right-6 z-20">
+      {/* Language Toggle - Bottom Right */}
+      <div className="fixed bottom-6 right-6 z-20">
         <LanguageToggle 
           currentLanguage={language} 
           onLanguageChange={setLanguage} 
@@ -351,7 +351,13 @@ function App() {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            FiFuFa🖐🏻
+            FiFuFa
+            <img 
+              src="/favicon.svg" 
+              alt="FiFuFa Logo" 
+              className="inline-block ml-2 w-12 h-12"
+              style={{ verticalAlign: 'bottom' }}
+            />
           </motion.h1>
           <motion.div
             className="inline-block px-6 py-2 rounded-full text-lg font-semibold"

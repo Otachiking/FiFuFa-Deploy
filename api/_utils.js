@@ -22,10 +22,26 @@ export const model = "ibm-granite/granite-3.3-8b-instruct:618ecbe80773609e96ea19
 
 // Simple logger for serverless environment
 export const logger = {
-  info: (message) => console.log(`[INFO] ${new Date().toISOString()} ${message}`),
-  error: (message) => console.error(`[ERROR] ${new Date().toISOString()} ${message}`),
-  warn: (message) => console.warn(`[WARN] ${new Date().toISOString()} ${message}`),
-  success: (message) => console.log(`[SUCCESS] ${new Date().toISOString()} ${message}`)
+  info: (message) => {
+    const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    const logMessage = `[${timestamp}] [INFO] ${message}`;
+    console.log(logMessage);
+  },
+  error: (message) => {
+    const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    const logMessage = `[${timestamp}] [ERROR] ${message}`;
+    console.error(logMessage);
+  },
+  warn: (message) => {
+    const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    const logMessage = `[${timestamp}] [WARN] ${message}`;
+    console.warn(logMessage);
+  },
+  success: (message) => {
+    const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    const logMessage = `[${timestamp}] [SUCCESS] ${message}`;
+    console.log(logMessage);
+  }
 };
 
 // Validation functions
