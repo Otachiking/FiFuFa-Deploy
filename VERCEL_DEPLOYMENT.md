@@ -31,6 +31,7 @@ This guide will walk you through deploying FiFuFa to Vercel, which should resolv
 
 3. **Set Environment Variables**
    - Add `REPLICATE_API_TOKEN` with your actual token
+   - Set `ALLOWED_ORIGINS` to your production URL (and optional dev hosts, comma separated)
    - Leave `VITE_API_URL` empty (will use relative paths)
 
 4. **Deploy**
@@ -68,7 +69,8 @@ This guide will walk you through deploying FiFuFa to Vercel, which should resolv
 5. **Set Environment Variables**
    ```bash
    vercel env add REPLICATE_API_TOKEN
-   # Enter your token when prompted
+   vercel env add ALLOWED_ORIGINS
+   # Enter your token/origin list when prompted
    ```
 
 6. **Deploy to Production**
@@ -96,6 +98,7 @@ This guide will walk you through deploying FiFuFa to Vercel, which should resolv
 4. **Environment Variables**
    - Click "Environment Variables"
    - Add: `REPLICATE_API_TOKEN` = `your_token_here`
+   - Add: `ALLOWED_ORIGINS` = `https://your-app.vercel.app`
    - Environment: Production (and Preview if needed)
 
 5. **Deploy**
@@ -235,6 +238,7 @@ vercel --prod
 - ✅ API token is secure in Vercel environment variables
 - ✅ No sensitive data in client-side code
 - ✅ CORS properly configured
+- ✅ Allowed origins explicitly controlled via `ALLOWED_ORIGINS`
 - ✅ Input validation on all endpoints
 - ✅ Rate limiting handled by Replicate API
 

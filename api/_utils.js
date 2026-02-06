@@ -1,6 +1,37 @@
 // Shared utilities for Vercel serverless functions
 import Replicate from "replicate";
 
+const DEFAULT_LOCAL_ORIGINS = [
+  "http://localhost:5173",
+  "http://localhost:4173",
+  "http://localhost:3000"
+];
+
+const envOrigins = (process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const derivedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.PUBLIC_FRONTEND_URL,
+  process.env.SITE_URL,
+  process.env.NEXT_PUBLIC_SITE_URL,
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null
+].filter(Boolean);
+
+const allowedOrigins = Array.from(
+  new Set([...envOrigins, ...derivedOrigins, ...DEFAULT_LOCAL_ORIGINS])
+);
+
+export const allowedOriginsList = allowedOrigins;
+
+const defaultServerOrigin = allowedOrigins[0] || "http://localhost:5173";
+
+if (!process.env.REPLICATE_API_TOKEN) {
+  console.warn("[WARN] REPLICATE_API_TOKEN is not set. Serverless routes will fail until it is configured.");
+}
+
 // Initialize Replicate client
 export const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
@@ -12,7 +43,7 @@ export const replicate = new Replicate({
         ...options.headers,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Origin': process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000',
+        'Origin': defaultServerOrigin,
       }
     });
   }
@@ -106,25 +137,58 @@ export const fallbackWords = {
   ]
 };
 
-// CORS headers
-export const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+const resolveOriginFromHeaders = (req) => {
+  if (req.headers.origin) {
+    return req.headers.origin;
+  }
+  if (req.headers.referer) {
+    try {
+      const refererUrl = new URL(req.headers.referer);
+      return refererUrl.origin;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+};
+
+const isTrustedOrigin = (origin) => {
+  if (!origin) {
+    return true;
+  }
+  if (allowedOrigins.length === 0) {
+    return true;
+  }
+  return allowedOrigins.includes(origin);
+};
+
+const buildCorsHeaders = (origin) => ({
+  'Access-Control-Allow-Origin': origin || '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Max-Age': '86400',
-};
+  'Vary': 'Origin'
+});
 
 // Handle CORS preflight
 export const handleCors = (req, res) => {
+  const origin = resolveOriginFromHeaders(req);
+
+  if (origin && !isTrustedOrigin(origin)) {
+    logger.warn(`Blocked request from unauthorized origin: ${origin}`);
+    res.status(403).json({ error: 'Origin not allowed' });
+    return true;
+  }
+
+  const headers = buildCorsHeaders(origin);
+  Object.entries(headers).forEach(([key, value]) => {
+    res.setHeader(key, value);
+  });
+
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return true;
   }
-  
-  // Set CORS headers for all requests
-  Object.entries(corsHeaders).forEach(([key, value]) => {
-    res.setHeader(key, value);
-  });
   
   return false;
 };
