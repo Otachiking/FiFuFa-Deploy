@@ -9,7 +9,8 @@ import {
   handleCors 
 } from './_utils.js';
 
-const REPLICATE_TIMEOUT_MS = Number(process.env.REPLICATE_TIMEOUT_MS || 22000);
+// Vercel free tier has 30s limit, use 28s to leave buffer for response
+const REPLICATE_TIMEOUT_MS = Number(process.env.REPLICATE_TIMEOUT_MS || 28000);
 
 const withTimeout = (promise, timeoutMs) => {
   return new Promise((resolve, reject) => {
@@ -38,6 +39,12 @@ export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Check if API token is configured
+  if (!process.env.REPLICATE_API_TOKEN) {
+    logger.error('REPLICATE_API_TOKEN is not configured');
+    return res.status(500).json({ error: 'Server configuration error. API token not set.' });
   }
 
   try {
@@ -102,11 +109,13 @@ export default async function handler(req, res) {
     if (error.status === 429) {
       res.status(429).json({ error: "Too many requests. Please wait a moment." });
     } else if (error.status === 504 || error.message?.includes('exceeded')) {
-      res.status(504).json({ error: "Fact generation took too long. Please try again." });
-    } else if (error.message.includes("Authentication") || error.message.includes("token")) {
-      res.status(401).json({ error: "API token issue. Please check configuration." });
+      res.status(504).json({ error: "AI model is warming up. Please try again in a few seconds." });
+    } else if (error.message?.includes("Authentication") || error.message?.includes("token") || error.message?.includes("Invalid")) {
+      res.status(401).json({ error: "API authentication failed. Please check server configuration." });
+    } else if (error.message?.includes("Model") || error.message?.includes("not found")) {
+      res.status(500).json({ error: "AI model unavailable. Please try again later." });
     } else {
-      res.status(500).json({ error: "Something went wrong." });
+      res.status(500).json({ error: `Server error: ${error.message || 'Unknown error'}` });
     }
   }
 }
