@@ -152,14 +152,37 @@ const resolveOriginFromHeaders = (req) => {
   return null;
 };
 
-const isTrustedOrigin = (origin) => {
+const isTrustedOrigin = (origin, req) => {
+  // No origin header = same-origin or non-browser request
   if (!origin) {
     return true;
   }
-  if (allowedOrigins.length === 0) {
+  
+  // Explicitly allowed origins
+  if (allowedOrigins.includes(origin)) {
     return true;
   }
-  return allowedOrigins.includes(origin);
+  
+  // Allow same Vercel deployment (frontend & API on same domain)
+  const host = req?.headers?.host;
+  if (host) {
+    const hostOrigin = `https://${host}`;
+    if (origin === hostOrigin) {
+      return true;
+    }
+  }
+  
+  // Allow any *.vercel.app subdomain (same project deployments)
+  try {
+    const originUrl = new URL(origin);
+    if (originUrl.hostname.endsWith('.vercel.app')) {
+      return true;
+    }
+  } catch {
+    // Invalid URL, reject
+  }
+  
+  return false;
 };
 
 const buildCorsHeaders = (origin) => ({
@@ -174,7 +197,7 @@ const buildCorsHeaders = (origin) => ({
 export const handleCors = (req, res) => {
   const origin = resolveOriginFromHeaders(req);
 
-  if (origin && !isTrustedOrigin(origin)) {
+  if (origin && !isTrustedOrigin(origin, req)) {
     logger.warn(`Blocked request from unauthorized origin: ${origin}`);
     res.status(403).json({ error: 'Origin not allowed' });
     return true;
