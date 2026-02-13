@@ -9,6 +9,28 @@ import {
   handleCors 
 } from './_utils.js';
 
+const REPLICATE_TIMEOUT_MS = Number(process.env.REPLICATE_TIMEOUT_MS || 22000);
+
+const withTimeout = (promise, timeoutMs) => {
+  return new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      const timeoutError = new Error(`Replicate request exceeded ${timeoutMs}ms`);
+      timeoutError.status = 504;
+      reject(timeoutError);
+    }, timeoutMs);
+
+    promise
+      .then((result) => {
+        clearTimeout(timeoutId);
+        resolve(result);
+      })
+      .catch((error) => {
+        clearTimeout(timeoutId);
+        reject(error);
+      });
+  });
+};
+
 export default async function handler(req, res) {
   // Handle CORS
   if (handleCors(req, res)) return;
@@ -51,7 +73,10 @@ export default async function handler(req, res) {
 
     logger.info(`Facts requested [${validLanguage}] for topic: "${sanitizedTopic}" ${more ? "(unpopular)" : "(popular)"}`);
 
-    const output = await replicate.run(model, { input });
+    const output = await withTimeout(
+      replicate.run(model, { input }),
+      REPLICATE_TIMEOUT_MS
+    );
     const factsRaw = output.join("");
 
     // Clean and format facts
@@ -76,6 +101,8 @@ export default async function handler(req, res) {
     
     if (error.status === 429) {
       res.status(429).json({ error: "Too many requests. Please wait a moment." });
+    } else if (error.status === 504 || error.message?.includes('exceeded')) {
+      res.status(504).json({ error: "Fact generation took too long. Please try again." });
     } else if (error.message.includes("Authentication") || error.message.includes("token")) {
       res.status(401).json({ error: "API token issue. Please check configuration." });
     } else {
