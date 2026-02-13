@@ -69,12 +69,12 @@ export default async function handler(req, res) {
     const promptText = getFactsPrompt(sanitizedTopic, validLanguage, more);
 
     const input = {
-      top_k: 50,
-      top_p: 0.7,
+      top_k: 40,
+      top_p: 0.9,
       prompt: promptText,
-      max_tokens: 250,
-      temperature: 0.3,
-      presence_penalty: 0.4,
+      max_tokens: 180,
+      temperature: 0.6,
+      presence_penalty: 0.3,
       frequency_penalty: 0.3,
     };
 

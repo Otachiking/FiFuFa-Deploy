@@ -49,7 +49,8 @@ export const replicate = new Replicate({
   }
 });
 
-export const model = "ibm-granite/granite-3.3-8b-instruct:618ecbe80773609e96ea19d8c96e708f6f2b368bb89be8fad509983194466bf8";
+// Using Llama 3.2 3B - faster inference, better cold start times
+export const model = "meta/meta-llama-3-8b-instruct";
 
 // Simple logger for serverless environment
 export const logger = {
@@ -99,16 +100,16 @@ export const validateLanguage = (language) => {
   return supportedLanguages.includes(language) ? language : 'en';
 };
 
-// Prompt generation functions
+// Prompt generation functions - optimized for speed
 export const getFactsPrompt = (topic, language, isMore = false) => {
   const prompts = {
     en: {
-      popular: `List 5 popular facts about ${topic}. Each <35 words & give relevant emojis`,
-      unpopular: `(facts 6-10) List 5 unpopular facts about ${topic}. Each <35 word & give relevant emojis. Be Unique`
+      popular: `5 fun facts about ${topic}. Short, with emoji. Format: 1. fact 2. fact etc`,
+      unpopular: `5 lesser-known facts about ${topic}. Short, with emoji. Format: 1. fact 2. fact etc`
     },
     id: {
-      popular: `Beri 5 fakta ringkas umum soal ${topic}. Per fakta beri emoji relevan per fakta SINGKAT AJA. Each <15 words. Pakai Bahasa Indonesia`,
-      unpopular: `Beri 5 fakta ringkas unpopular soal ${topic}. Each <15 words.  Per fakta beri emoji relevan per fakta SINGKAT AJA. Pakai Bahasa Indonesia`
+      popular: `5 fakta menarik tentang ${topic}. Singkat, pakai emoji. Format: 1. fakta 2. fakta dst`,
+      unpopular: `5 fakta jarang diketahui tentang ${topic}. Singkat, pakai emoji. Format: 1. fakta 2. fakta dst`
     }
   };
   
@@ -118,8 +119,8 @@ export const getFactsPrompt = (topic, language, isMore = false) => {
 
 export const getRandomWordsPrompt = (language) => {
   const prompts = {
-    en: `Say 7 specific topics from countries, history, pop culture, hobbies, etc. Separated commas, NOT list, max 2 terms each.`,
-    id: `Sebut 7 topik spesifik dari Indonesia soal sejarah, budaya pop, hobi, dll. Dipisah koma, BUKAN list, maks 2 kata per topik.`
+    en: `List 7 random topics: ninja, pyramids, coffee, etc. Comma separated only.`,
+    id: `Sebut 7 topik acak: komodo, batik, rendang, dll. Pisah koma saja.`
   };
   
   return prompts[language] || prompts.en;

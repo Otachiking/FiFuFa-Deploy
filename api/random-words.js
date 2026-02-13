@@ -37,13 +37,13 @@ export default async function handler(req, res) {
         const promptText = getRandomWordsPrompt(validLanguage);
         
         const input = {
-          top_k: 50,
+          top_k: 40,
           top_p: 0.9,
           prompt: promptText,
-          max_tokens: 150,
+          max_tokens: 80,
           temperature: 0.8,
-          presence_penalty: 0.7,
-          frequency_penalty: 0.7,
+          presence_penalty: 0.5,
+          frequency_penalty: 0.5,
         };
 
         const output = await replicate.run(model, { input });

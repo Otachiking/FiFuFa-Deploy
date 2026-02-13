@@ -17,7 +17,7 @@ app.use(express.json());
 // Replicate setup
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
-  userAgent: "FiFuFa/1.0.0 (https://github.com/Otachiking/FiFuFa-Ver4)",
+  userAgent: "FiFuFa/1.0.0 (https://github.com/Otachiking/FiFuFa-Deploy)",
   fetch: (url, options) => {
     return fetch(url, {
       ...options,
@@ -37,7 +37,8 @@ console.log("- REPLICATE_API_TOKEN:", process.env.REPLICATE_API_TOKEN ? "✅ Set
 console.log("- NODE_ENV:", process.env.NODE_ENV);
 console.log("- PORT:", process.env.PORT);
 
-const model = "ibm-granite/granite-3.3-8b-instruct:618ecbe80773609e96ea19d8c96e708f6f2b368bb89be8fad509983194466bf8";
+// Using Llama 3 8B - faster inference, better cold start times
+const model = "meta/meta-llama-3-8b-instruct";
 
 // Language-specific word caches
 const wordCaches = {
